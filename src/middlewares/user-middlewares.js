@@ -4,7 +4,8 @@ import { ErrorResponse } from "../utils/common/index.js";
 import WAValidator from "multicoin-address-validator";
 
 function validateAddress(req, res, next) {
-  let valid = WAValidator.validate(req.body.userAddress, req.body.userAddress, {
+  const { userAddress } = req.params;
+  let valid = WAValidator.validate(userAddress, "UNKNOWN TOKEN", {
     chainType: "ethereum",
   });
   if (!valid) {

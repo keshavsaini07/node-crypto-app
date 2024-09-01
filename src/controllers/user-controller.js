@@ -5,9 +5,10 @@ import { UserService } from "../services/index.js";
 
 async function fetchTransactions(req, res) {
   try {
+    const { userAddress } = req.params;
     const user = await UserService.fetchTransactions({
-        userAddress: req.body.userAddress || ServerConfig.USER_ADDRESS,
-        apiKey: ServerConfig.API_KEY
+      userAddress: userAddress,
+      apiKey: ServerConfig.API_KEY
     });
     SuccessResponse.data = user;
     return res.status(StatusCodes.CREATED).json(SuccessResponse);
@@ -20,8 +21,9 @@ async function fetchTransactions(req, res) {
 
 async function fetchTotalExpense(req, res) {
   try {
+    const { userAddress } = req.params;
     const expense = await UserService.fetchTotalExpense({
-      userAddress: req.body.userAddress || ServerConfig.USER_ADDRESS
+      userAddress: userAddress
     });
     SuccessResponse.data = expense;
     return res.status(StatusCodes.CREATED).json(SuccessResponse);
