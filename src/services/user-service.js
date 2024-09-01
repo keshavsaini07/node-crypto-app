@@ -3,6 +3,7 @@ import AppError from "../utils/errors/app-error.js";
 import axios from "axios";
 import UserTransactions from "../models/user-transactions.js";
 import { ServerConfig } from "../config/index.js";
+import EthereumPrice from "../models/ethereum-price.js";
 
 async function fetchTransactions(data) {
   try {
@@ -56,7 +57,19 @@ async function fetchEthereumPrice() {
   try {
     const response = await axios.get(ServerConfig.ETHEREUM_PRICE_URL);
     const price = response.data.ethereum.inr;
-    console.log(price)
+    // console.log(price)
+    const findEthereum = await EthereumPrice.findOne({ network: "ethereum" });
+    if(findEthereum){
+        findEthereum.price = price; 
+        await findEthereum.save();
+        console.log(findEthereum);
+        return;
+    }
+    const id = await EthereumPrice.create({
+        network: "ethereum",
+        price: price
+    })
+    console.log(id);
     // return price;
   } catch (error) {
     // console.log(error);
