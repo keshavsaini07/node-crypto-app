@@ -9,4 +9,7 @@ router.get("/info", InfoController.info);
 // /api/v1/user/transactions - GET
 router.get("/user/transactions", UserController.fetchTransactions)
 
+// /api/v1/user/expenses - GET
+router.get("/user/expenses",  UserController.fetchTotalExpense)
+
 export default router;

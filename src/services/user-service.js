@@ -37,15 +37,10 @@ async function saveTransactions(data) {
       return;
     }
     const user = await UserTransactions.create(data);
-    console.log(user);
+
+    // console.log(user);
   } catch (error) {
     console.log(error);
-    if (error.statusCode == StatusCodes.BAD_REQUEST) {
-      throw new AppError(
-        "Given User object already exists",
-        StatusCodes.BAD_REQUEST
-      );
-    }
     throw new AppError(
       "Cannot create a new user object",
       StatusCodes.INTERNAL_SERVER_ERROR
@@ -57,24 +52,56 @@ async function fetchEthereumPrice() {
   try {
     const response = await axios.get(ServerConfig.ETHEREUM_PRICE_URL);
     const price = response.data.ethereum.inr;
-    // console.log(price)
+
     const findEthereum = await EthereumPrice.findOne({ network: "ethereum" });
-    if(findEthereum){
-        findEthereum.price = price; 
-        await findEthereum.save();
-        console.log(findEthereum);
-        return;
+
+    if (findEthereum) {
+      findEthereum.price = price;
+      await findEthereum.save();
+      return;
     }
+
     const id = await EthereumPrice.create({
-        network: "ethereum",
-        price: price
-    })
-    console.log(id);
-    // return price;
+      network: "ethereum",
+      price: price,
+    });
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     throw new AppError(
       "Cannot fetch Ethereum price",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+}
+
+async function fetchTotalExpense(data) {
+  try {
+    const findUser = await UserTransactions.findOne({
+      userAddress: data.userAddress,
+    });
+
+    const price = (
+      await EthereumPrice.findOne({
+        network: "ethereum",
+      })
+    ).price;
+
+    if (findUser && price) {
+      let transactions = JSON.parse(findUser.transactions);
+      let totalExpense = 0;
+      transactions.map((transaction) => {
+        let gasUsed = parseFloat(transaction.gasUsed);
+        let gasPrice = parseFloat(transaction.gasPrice);
+        let expense = (gasUsed * gasPrice) / 1e18;
+        totalExpense += expense;
+      });
+      // console.log(totalExpense, price);
+      return { totalExpenses: parseFloat(totalExpense.toFixed(6)), currentPrice: price };
+    }
+  } catch (error) {
+    console.log(error);
+    throw new AppError(
+      "Cannot fetch total expense and ethereum price",
       StatusCodes.INTERNAL_SERVER_ERROR
     );
   }
@@ -83,4 +110,5 @@ async function fetchEthereumPrice() {
 export default {
   fetchTransactions,
   fetchEthereumPrice,
+  fetchTotalExpense,
 };

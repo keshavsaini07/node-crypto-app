@@ -18,6 +18,21 @@ async function fetchTransactions(req, res) {
   }
 }
 
+async function fetchTotalExpense(req, res) {
+  try {
+    const expense = await UserService.fetchTotalExpense({
+      userAddress: req.body.userAddress || ServerConfig.USER_ADDRESS
+    });
+    SuccessResponse.data = expense;
+    return res.status(StatusCodes.CREATED).json(SuccessResponse);
+  } catch (error) {
+    console.log(error);
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
+  }
+}
+
 export default {
   fetchTransactions,
+  fetchTotalExpense
 };
