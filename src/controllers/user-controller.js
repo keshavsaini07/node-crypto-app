@@ -18,6 +18,6 @@ async function fetchTransactions(req, res) {
   }
 }
 
-export default{
-    fetchTransactions,
-}
+export default {
+  fetchTransactions,
+};

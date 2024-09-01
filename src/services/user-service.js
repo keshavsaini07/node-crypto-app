@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import AppError from "../utils/errors/app-error.js";
 import axios from "axios";
 import UserTransactions from "../models/user-transactions.js";
+import { ServerConfig } from "../config/index.js";
 
 async function fetchTransactions(data) {
   try {
@@ -51,6 +52,22 @@ async function saveTransactions(data) {
   }
 }
 
+async function fetchEthereumPrice() {
+  try {
+    const response = await axios.get(ServerConfig.ETHEREUM_PRICE_URL);
+    const price = response.data.ethereum.inr;
+    console.log(price)
+    // return price;
+  } catch (error) {
+    // console.log(error);
+    throw new AppError(
+      "Cannot fetch Ethereum price",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+}
+
 export default {
   fetchTransactions,
+  fetchEthereumPrice,
 };

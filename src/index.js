@@ -3,6 +3,7 @@ import cors from 'cors';
 
 import apiRoutes from './routes/index.js'
 import { ServerConfig, connectDB } from './config/index.js'
+import {scheduleCrons as CRON} from "./utils/common/cron-jobs.js"
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/api', apiRoutes);
     console.log("Database Connected");
     app.listen(ServerConfig.PORT, () => {
       console.log(`Server successfully started on port : ${ServerConfig.PORT}`);
+      CRON();
     });
   } catch (error) {
     console.log("Database Connection Error: ", error);
